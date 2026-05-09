@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DateMatch · Will You Match?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08050f;
+  --surface:#130d22;
+  --card:#18102e;
+  --card2:#1c1330;
+  --pink:#ff2d78;
+  --pink2:#d4215f;
+  --purple:#9b00ff;
+  --violet:#bb44ff;
+  --cyan:#00d4ff;
+  --text:#f0ebff;
+  --text2:#c8bfdf;
+  --muted:#7a6fa0;
+  --faint:#261b42;
+  --border:rgba(155,0,255,0.2);
+  --glow-pk:0 0 22px rgba(255,45,120,0.5),0 0 50px rgba(255,45,120,0.15);
+  --font-h:'Orbitron',monospace;
+  --font-b:'DM Sans',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-b);
+  font-size:15px;
+  line-height:1.65;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* animated background */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 55% 45% at 5%  0%,  rgba(155,0,255,0.20) 0%,transparent 60%),
+    radial-gradient(ellipse 45% 35% at 95% 0%,  rgba(255,45,120,0.16) 0%,transparent 55%),
+    radial-gradient(ellipse 35% 25% at 50% 100%,rgba(0,128,255,0.10) 0%,transparent 60%);
+}
+/* scanlines */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(180deg,transparent,transparent 3px,rgba(120,0,220,0.012) 3px,rgba(120,0,220,0.012) 4px);
+}
+
+.shell{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:0 22px 90px}
+
+/* ── HERO ─────────────────────────────────────────────────── */
+.hero{text-align:center;padding:52px 20px 0;position:relative}
+
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--font-b);font-size:13px;font-weight:500;
+  color:var(--cyan);letter-spacing:.02em;
+  background:rgba(0,212,255,0.07);
+  border:1px solid rgba(0,212,255,0.22);
+  padding:7px 18px;border-radius:100px;margin-bottom:24px;
+  box-shadow:0 0 16px rgba(0,212,255,0.12);
+}
+.hero-eyebrow .dot{width:7px;height:7px;background:var(--cyan);border-radius:50%;box-shadow:0 0 8px var(--cyan);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+
+.hero h1{
+  font-family:var(--font-h);
+  font-size:clamp(30px,6.5vw,58px);
+  font-weight:800;
+  line-height:1.08;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  margin-bottom:18px;
+}
+.grad-text{
+  background:linear-gradient(100deg,var(--pink) 0%,var(--violet) 50%,var(--cyan) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 24px rgba(255,45,120,0.35));
+}
+.hero-sub{
+  font-size:16px;font-weight:300;color:var(--text2);
+  max-width:520px;margin:0 auto 28px;line-height:1.7;
+  font-style:italic;
+}
+
+/* stat pills */
+.stat-row{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.stat-pill{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:100px;padding:6px 16px;font-size:13px;
+}
+.stat-pill strong{font-family:var(--font-h);font-size:12px;color:var(--pink);font-weight:600}
+.stat-pill span{color:var(--muted);font-weight:300}
+
+/* mountains */
+.mountain-wrap{position:relative;height:120px;margin-top:4px;overflow:hidden;pointer-events:none}
+
+/* ── SECTION CARDS ──────────────────────────────────────── */
+.card{
+  background:linear-gradient(150deg,rgba(24,16,46,0.96),rgba(14,9,26,0.98));
+  border:1px solid var(--border);border-radius:20px;
+  overflow:hidden;margin-bottom:14px;
+  transition:border-color .3s;
+}
+.card:hover{border-color:rgba(255,45,120,0.28)}
+.card-bar{
+  height:2px;
+  background:linear-gradient(90deg,transparent 0%,var(--pink) 30%,var(--violet) 65%,var(--cyan) 85%,transparent 100%);
+  opacity:.65;
+}
+
+.card-body{padding:24px 28px}
+
+.card-title{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:20px;
+}
+.card-title .tag{
+  font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);background:rgba(255,255,255,0.05);
+  border:1px solid var(--faint);border-radius:6px;padding:3px 10px;
+}
+.card-title .emoji{font-size:18px;line-height:1}
+.card-title p{
+  font-size:13px;color:var(--muted);font-weight:300;margin-top:2px;
+}
+
+/* ── FORM FIELDS ────────────────────────────────────────── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px 20px}
+
+.field{display:flex;flex-direction:column;gap:7px}
+
+.field label{
+  font-size:12px;font-weight:500;color:var(--muted);
+  letter-spacing:.04em;
+  display:flex;align-items:center;gap:6px;
+}
+.field label .lico{font-size:14px}
+
+.hint{font-size:11px;color:var(--faint);font-weight:300;margin-top:-3px}
+
+select,input[type="number"]{
+  background:rgba(8,4,18,0.7);
+  border:1px solid rgba(80,50,140,0.4);
+  border-radius:11px;color:var(--text);
+  font-family:var(--font-b);font-size:14px;
+  padding:11px 15px;width:100%;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+  appearance:none;-webkit-appearance:none;
+}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239b00ff' stroke-width='1.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;
+  padding-right:34px;cursor:pointer;
+}
+select option{background:#130d22}
+select:focus,input:focus{
+  border-color:rgba(255,45,120,0.6);
+  box-shadow:0 0 0 3px rgba(255,45,120,0.10),0 0 18px rgba(255,45,120,0.18);
+}
+select:hover,input[type="number"]:hover{border-color:rgba(155,0,255,0.45)}
+
+/* sliders */
+.slider-wrap{display:flex;flex-direction:column;gap:8px}
+.slider-row{display:flex;align-items:center;gap:14px}
+input[type="range"]{
+  flex:1;height:3px;border:none;padding:0;
+  -webkit-appearance:none;appearance:none;
+  background:linear-gradient(to right,var(--pink),var(--purple));
+  border-radius:2px;outline:none;cursor:pointer;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;
+  background:radial-gradient(circle,var(--pink),var(--pink2));
+  border-radius:50%;cursor:pointer;border:2px solid var(--bg);
+  box-shadow:0 0 10px rgba(255,45,120,0.7),0 0 22px rgba(255,45,120,0.3);
+}
+.sv{
+  font-family:var(--font-h);font-size:13px;font-weight:600;
+  color:var(--cyan);min-width:50px;text-align:right;
+  text-shadow:0 0 10px rgba(0,212,255,0.7);
+}
+.sb{display:flex;justify-content:space-between;font-size:10px;color:var(--faint);padding:0 1px}
+
+/* ── PREDICT BUTTON ─────────────────────────────────────── */
+.predict-wrap{margin-bottom:16px}
+.btn{
+  width:100%;padding:18px 24px;
+  background:linear-gradient(115deg,var(--pink2),var(--purple),var(--violet));
+  background-size:220% 220%;
+  border:none;border-radius:14px;
+  color:#fff;font-family:var(--font-b);font-size:16px;font-weight:600;
+  letter-spacing:.01em;
+  cursor:pointer;
+  box-shadow:var(--glow-pk);
+  transition:opacity .2s,transform .15s,box-shadow .2s;
+  position:relative;overflow:hidden;
+  animation:bg-drift 4s ease infinite;
+}
+@keyframes bg-drift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,0.10) 50%,transparent 65%);
+  background-size:200% 100%;animation:sheen 3s infinite;
+}
+@keyframes sheen{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.btn:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 0 35px rgba(255,45,120,0.65),0 0 70px rgba(155,0,255,0.35)}
+.btn:active{transform:scale(.98)}
+.btn.busy{pointer-events:none;opacity:.65}
+.ring{
+  display:none;width:18px;height:18px;
+  border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
+  border-radius:50%;animation:spin .65s linear infinite;
+  position:absolute;right:22px;top:50%;margin-top:-9px;
+}
+.btn.busy .ring{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#err{
+  display:none;margin-top:12px;
+  background:rgba(255,30,60,0.07);border:1px solid rgba(255,30,60,0.25);
+  color:#ff8099;border-radius:11px;padding:12px 18px;
+  font-size:13px;text-align:center;line-height:1.5;
+}
+#err.on{display:block}
+
+/* ── RESULT ─────────────────────────────────────────────── */
+#result{display:none;margin-top:18px}
+#result.on{display:block;animation:rise .5s cubic-bezier(.2,.85,.4,1)}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+.result-card{
+  background:linear-gradient(150deg,rgba(26,10,45,0.98),rgba(12,6,22,0.99));
+  border:1px solid rgba(255,45,120,0.45);border-radius:20px;overflow:hidden;
+  box-shadow:0 0 30px rgba(255,45,120,0.2),0 0 80px rgba(155,0,255,0.10);
+  margin-bottom:14px;
+}
+.result-card .card-bar{opacity:1;background:linear-gradient(90deg,transparent,var(--pink),var(--violet),var(--cyan),transparent)}
+.result-core{padding:32px 28px;text-align:center}
+.r-emoji{font-size:56px;margin-bottom:10px;filter:drop-shadow(0 0 16px rgba(255,45,120,0.6));display:block}
+.r-name{
+  font-family:var(--font-h);font-size:24px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.06em;
+  background:linear-gradient(90deg,var(--pink),var(--violet));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;margin-bottom:6px;
+}
+.r-tagline{font-size:14px;color:var(--text2);font-weight:300;font-style:italic;margin-bottom:14px}
+.r-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);
+  border-radius:100px;padding:5px 16px;font-size:13px;
+  color:var(--cyan);font-weight:500;
+}
+.r-badge strong{font-family:var(--font-h);font-size:12px}
+
+/* probability panel */
+.prob-card{
+  background:linear-gradient(150deg,rgba(22,14,40,0.96),rgba(13,8,24,0.98));
+  border:1px solid var(--border);border-radius:20px;overflow:hidden;
+}
+.prob-head{
+  padding:18px 28px 0;
+  font-size:13px;color:var(--muted);font-weight:400;font-style:italic;
+}
+.prob-list{padding:14px 28px 24px;display:flex;flex-direction:column;gap:9px}
+.prow{display:flex;align-items:center;gap:12px}
+.prow-left{display:flex;align-items:center;gap:7px;min-width:155px}
+.prow-ico{font-size:15px}
+.prow-name{font-size:13px;color:var(--text2)}
+.prow-name.winner{color:var(--text);font-weight:500}
+.ptrack{flex:1;height:6px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden}
+.pfill{height:100%;border-radius:100px;background:linear-gradient(to right,rgba(155,0,255,0.6),rgba(255,45,120,0.8));transition:width .75s cubic-bezier(.4,0,.2,1)}
+.pfill.hi{background:linear-gradient(to right,var(--pink2),var(--cyan));box-shadow:0 0 10px rgba(0,212,255,0.45)}
+.ppct{font-size:12px;min-width:40px;text-align:right;color:var(--muted);font-family:var(--font-h);font-weight:600;font-size:11px}
+
+/* outcome taglines */
+.taglines{display:none}
+
+/* footer */
+.footer{text-align:center;color:var(--faint);font-size:12px;margin-top:44px;line-height:1.7}
+.footer strong{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow"><div class="dot"></div> Powered by Gradient Boosting AI</div>
+    <h1><span class="grad-text">Will it be<br/>a match?</span></h1>
+    <p class="hero-sub">Tell us a little about how someone uses the app — swipes, messages, activity — and we'll predict how their story ends.</p>
+    <div class="stat-row">
+      <div class="stat-pill"><strong>60.32%</strong><span>model accuracy</span></div>
+      <div class="stat-pill"><strong>10</strong><span>possible outcomes</span></div>
+      <div class="stat-pill"><strong>15</strong><span>behaviour signals</span></div>
+    </div>
+  </div>
+
+  <!-- MOUNTAIN SVG -->
+  <div class="mountain-wrap">
+    <svg viewBox="0 0 900 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="width:100%;height:100%">
+      <defs>
+        <linearGradient id="m1" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#9b00ff" stop-opacity="0"/>
+          <stop offset="25%"  stop-color="#cc44ff" stop-opacity="0.65"/>
+          <stop offset="60%"  stop-color="#ff2d78" stop-opacity="0.75"/>
+          <stop offset="100%" stop-color="#0080ff" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="m2" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#ff2d78" stop-opacity="0"/>
+          <stop offset="45%"  stop-color="#9b00ff" stop-opacity="0.40"/>
+          <stop offset="80%"  stop-color="#cc44ff" stop-opacity="0.50"/>
+          <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="glow2"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <polygon points="0,120 90,55 170,85 265,25 345,65 425,8 510,52 590,18 665,62 745,32 825,70 900,38 900,120" fill="url(#m2)" opacity="0.28"/>
+      <polygon points="0,120 65,78 145,98 225,46 315,82 405,20 492,66 572,36 648,75 728,46 812,82 900,52 900,120" fill="url(#m1)" opacity="0.52" filter="url(#glow2)"/>
+      <polyline points="0,120 65,78 145,98 225,46 315,82 405,20 492,66 572,36 648,75 728,46 812,82 900,52" fill="none" stroke="url(#m1)" stroke-width="1.8" opacity="0.85"/>
+    </svg>
+  </div>
+
+  <!-- WHO ARE THEY -->
+  <div class="card">
+    <div class="card-bar"></div>
+    <div class="card-body">
+      <div class="card-title">
+        <span class="emoji">🧑</span>
+        <div>
+          <div class="tag">About the person</div>
+          <p>Basic identity and background</p>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="field">
+          <label><span class="lico">⚧</span> How do they identify?</label>
+          <select id="gender"></select>
+        </div>
+        <div class="field">
+          <label><span class="lico">🏳️‍🌈</span> Sexual orientation</label>
+          <select id="sexual_orientation"></select>
+        </div>
+        <div class="field">
+          <label><span class="lico">🏙️</span> Where do they live?</label>
+          <select id="location_type"></select>
+        </div>
+        <div class="field">
+          <label><span class="lico">💰</span> Income level</label>
+          <select id="income_bracket"></select>
+        </div>
+        <div class="field">
+          <label><span class="lico">🎓</span> Highest education</label>
+          <select id="education_level"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW THEY USE THE APP -->
+  <div class="card">
+    <div class="card-bar"></div>
+    <div class="card-body">
+      <div class="card-title">
+        <span class="emoji">📲</span>
+        <div>
+          <div class="tag">App behaviour</div>
+          <p>How they spend time swiping</p>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="field">
+          <label><span class="lico">⏱️</span> Daily time on the app</label>
+          <div class="slider-wrap">
+            <div class="slider-row">
+              <input type="range" id="app_usage_time_min" min="1" max="480" value="90" oninput="sv('u1',this.value+' min')"/>
+              <span class="sv" id="u1">90 min</span>
+            </div>
+            <div class="sb"><span>1 min</span><span>8 hours</span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span class="lico">👉</span> How often do they swipe right?</label>
+          <div class="slider-wrap">
+            <div class="slider-row">
+              <input type="range" id="swipe_right_ratio" min="0" max="1" value="0.5" step="0.01" oninput="sv('u2',(this.value*100|0)+'%')"/>
+              <span class="sv" id="u2">50%</span>
+            </div>
+            <div class="sb"><span>Very picky</span><span>Swipes everyone</span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span class="lico">😄</span> Emoji in messages</label>
+          <div class="slider-wrap">
+            <div class="slider-row">
+              <input type="range" id="emoji_usage_rate" min="0" max="1" value="0.3" step="0.01" oninput="sv('u3',(this.value*100|0)+'%')"/>
+              <span class="sv" id="u3">30%</span>
+            </div>
+            <div class="sb"><span>No emojis</span><span>Every message</span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span class="lico">🌙</span> Usually active at hour…</label>
+          <input type="number" id="last_active_hour" min="0" max="23" value="13" placeholder="e.g. 13 = 1pm"/>
+          <span class="hint">0 = midnight · 13 = 1 pm · 23 = 11 pm</span>
+        </div>
+
+        <div class="field">
+          <label><span class="lico">🕐</span> When do they usually swipe?</label>
+          <select id="swipe_time_of_day"></select>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE NUMBERS -->
+  <div class="card">
+    <div class="card-bar"></div>
+    <div class="card-body">
+      <div class="card-title">
+        <span class="emoji">✨</span>
+        <div>
+          <div class="tag">Profile & engagement</div>
+          <p>What their profile looks like in numbers</p>
+        </div>
+      </div>
+      <div class="grid">
+
+        <div class="field">
+          <label><span class="lico">❤️</span> Likes they've received</label>
+          <div class="slider-wrap">
+            <div class="slider-row">
+              <input type="range" id="likes_received" min="0" max="500" value="100" oninput="sv('u4',this.value)"/>
+              <span class="sv" id="u4">100</span>
+            </div>
+            <div class="sb"><span>0</span><span>500</span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span class="lico">🤝</span> Mutual matches so far</label>
+          <div class="slider-wrap">
+            <div class="slider-row">
+              <input type="range" id="mutual_matches" min="0" max="100" value="15" oninput="sv('u5',this.value)"/>
+              <span class="sv" id="u5">15</span>
+            </div>
+            <div class="sb"><span>0</span><span>100</span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span class="lico">📸</span> Photos on their profile</label>
+          <div class="slider-wrap">
+            <div class="slider-row">
+              <input type="range" id="profile_pics_count" min="1" max="9" value="4" oninput="sv('u6',this.value)"/>
+              <span class="sv" id="u6">4</span>
+            </div>
+            <div class="sb"><span>1 photo</span><span>9 photos</span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span class="lico">✍️</span> How long is their bio?</label>
+          <div class="slider-wrap">
+            <div class="slider-row">
+              <input type="range" id="bio_length" min="0" max="500" value="150" oninput="sv('u7',this.value+' chars')"/>
+              <span class="sv" id="u7">150 chars</span>
+            </div>
+            <div class="sb"><span>Empty bio</span><span>500 chars</span></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><span class="lico">💬</span> Messages they've sent</label>
+          <div class="slider-wrap">
+            <div class="slider-row">
+              <input type="range" id="message_sent_count" min="0" max="300" value="40" oninput="sv('u8',this.value)"/>
+              <span class="sv" id="u8">40</span>
+            </div>
+            <div class="sb"><span>0</span><span>300</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- BUTTON -->
+  <div class="predict-wrap">
+    <button class="btn" id="btn" onclick="runPredict()">
+      Find out their fate ✦
+      <div class="ring"></div>
+    </button>
+    <div id="err"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result">
+    <div class="result-card">
+      <div class="card-bar"></div>
+      <div class="result-core">
+        <span class="r-emoji" id="r-emoji">💫</span>
+        <div class="r-name" id="r-name">—</div>
+        <div class="r-tagline" id="r-tagline"></div>
+        <div class="r-badge">Model confidence: <strong id="r-conf">—</strong></div>
+      </div>
+    </div>
+
+    <div class="prob-card">
+      <div class="card-bar"></div>
+      <div class="prob-head">Here's how all 10 outcomes stacked up…</div>
+      <div class="prob-list" id="r-bars"></div>
+    </div>
+  </div>
+
+  <p class="footer">
+    Built with <strong>Gradient Boosting</strong> · Trained on dating app behaviour signals<br/>
+    <span style="font-size:11px">For academic use · Predictions are probabilistic, not personal advice ✦</span>
+  </p>
+
+</div>
+
+<script>
+const API = 'http://localhost:5000';
+
+const META = {
+  'Blocked':           { icon:'🚫', line:'Oops — they got blocked.' },
+  'Catfished':         { icon:'🎣', line:'Something felt off to the other side.' },
+  'Chat Ignored':      { icon:'💬', line:'A message sent, but never read.' },
+  'Date Happened':     { icon:'📅', line:'They actually went on a date!' },
+  'Ghosted':           { icon:'👻', line:'They matched… then disappeared.' },
+  'Instant Match':     { icon:'⚡', line:'Both swiped right at the same moment.' },
+  'Mutual Match':      { icon:'💞', line:'They matched and started chatting.' },
+  'No Action':         { icon:'😶', line:'Nothing happened on either side.' },
+  'One-sided Like':    { icon:'💔', line:'They liked someone who didn\'t like back.' },
+  'Relationship Formed':{ icon:'💍', line:'Something real came out of this.' },
+};
+
+function sv(id, v) { document.getElementById(id).textContent = v; }
+
+async function loadMeta() {
+  try {
+    const r = await fetch(`${API}/metadata`);
+    if (!r.ok) throw new Error();
+    const m = await r.json();
+    ['gender','sexual_orientation','location_type','income_bracket',
+     'education_level','swipe_time_of_day'].forEach(id => {
+      document.getElementById(id).innerHTML =
+        (m.categorical_options[id]||[]).map(o=>`<option value="${o}">${o}</option>`).join('');
+    });
+  } catch { fallback(); }
+}
+
+function fallback() {
+  const o = {
+    gender: ['Female','Genderfluid','Male','Non-binary','Prefer Not to Say','Transgender'],
+    sexual_orientation: ['Asexual','Bisexual','Demisexual','Gay','Lesbian','Pansexual','Queer','Straight'],
+    location_type: ['Metro','Remote Area','Rural','Small Town','Suburban','Urban'],
+    income_bracket: ['High','Low','Lower-Middle','Middle','Upper-Middle','Very High','Very Low'],
+    education_level: ['\u2018Associate\u2019s','\u2018Bachelor\u2019s','Diploma','High School',
+                      'MBA','\u2018Master\u2019s','No Formal Education','PhD','Postdoc'],
+    swipe_time_of_day: ['After Midnight','Afternoon','Early Morning','Evening','Late Night','Morning'],
+  };
+  Object.entries(o).forEach(([id,vals]) => {
+    document.getElementById(id).innerHTML = vals.map(v=>`<option value="${v}">${v}</option>`).join('');
+  });
+}
+
+function payload() {
+  return {
+    gender:              document.getElementById('gender').value,
+    sexual_orientation:  document.getElementById('sexual_orientation').value,
+    location_type:       document.getElementById('location_type').value,
+    income_bracket:      document.getElementById('income_bracket').value,
+    education_level:     document.getElementById('education_level').value,
+    app_usage_time_min:  +document.getElementById('app_usage_time_min').value,
+    swipe_right_ratio:   +document.getElementById('swipe_right_ratio').value,
+    likes_received:      +document.getElementById('likes_received').value,
+    mutual_matches:      +document.getElementById('mutual_matches').value,
+    profile_pics_count:  +document.getElementById('profile_pics_count').value,
+    bio_length:          +document.getElementById('bio_length').value,
+    message_sent_count:  +document.getElementById('message_sent_count').value,
+    emoji_usage_rate:    +document.getElementById('emoji_usage_rate').value,
+    last_active_hour:    +document.getElementById('last_active_hour').value,
+    swipe_time_of_day:   document.getElementById('swipe_time_of_day').value,
+  };
+}
+
+async function runPredict() {
+  const btn   = document.getElementById('btn');
+  const errEl = document.getElementById('err');
+  const panel = document.getElementById('result');
+  btn.classList.add('busy');
+  btn.childNodes[0].textContent = 'Reading the signals… ';
+  errEl.classList.remove('on');
+  panel.classList.remove('on');
+
+  try {
+    const res = await fetch(`${API}/predict`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload()),
+    });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || 'Something went wrong on the server.');
+    renderResult(d);
+  } catch(e) {
+    errEl.textContent = `Couldn't reach the model — ${e.message}. Make sure the Flask backend is running on port 5000.`;
+    errEl.classList.add('on');
+  } finally {
+    btn.classList.remove('busy');
+    btn.childNodes[0].textContent = 'Find out their fate ✦ ';
+  }
+}
+
+function renderResult(d) {
+  const info = META[d.prediction] || { icon:'🔮', line:'The model has spoken.' };
+  document.getElementById('r-emoji').textContent   = info.icon;
+  document.getElementById('r-name').textContent    = d.prediction;
+  document.getElementById('r-tagline').textContent = info.line;
+  document.getElementById('r-conf').textContent    = (d.confidence * 100).toFixed(1) + '%';
+
+  const sorted = Object.entries(d.probabilities).sort((a,b) => b[1]-a[1]);
+  const max    = sorted[0][1];
+
+  document.getElementById('r-bars').innerHTML = sorted.map(([cls, p]) => {
+    const pct  = (p * 100).toFixed(1);
+    const w    = max > 0 ? ((p / max) * 100).toFixed(1) : 0;
+    const info2 = META[cls] || { icon:'·' };
+    const win  = cls === d.prediction;
+    return `<div class="prow">
+      <div class="prow-left">
+        <span class="prow-ico">${info2.icon}</span>
+        <span class="prow-name${win?' winner':''}">${cls}</span>
+      </div>
+      <div class="ptrack"><div class="pfill${win?' hi':''}" style="width:${w}%"></div></div>
+      <span class="ppct">${pct}%</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('result').classList.add('on');
+  document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+loadMeta();
+</script>
+</body>
+</html>

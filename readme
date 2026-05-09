@@ -1,0 +1,130 @@
+# DateMatch — Dating App Match Outcome Predictor
+
+Predicts one of **10 match outcomes** from dating profile behaviour signals using a
+**Gradient Boosting** model (60.32% accuracy).
+
+## Project layout
+
+```
+datematch/
+├── backend/
+│   ├── app.py              ← Flask API (2 endpoints)
+│   ├── requirements.txt
+│   └── models/             ← place all .pkl files here
+│       ├── best_model.pkl
+│       ├── label_encoders.pkl
+│       ├── le_target.pkl
+│       ├── scaler.pkl
+│       └── scaler2.pkl
+└── frontend/
+    └── index.html          ← open directly in a browser
+```
+
+## Quick start
+
+### 1 · Backend
+
+```bash
+cd backend
+
+# (recommended) create a virtual environment
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+
+# install dependencies — scikit-learn version must match the trained models
+pip install -r requirements.txt
+
+# start the API
+python app.py
+# → http://localhost:5000
+```
+
+### 2 · Frontend
+
+Just open `frontend/index.html` in your browser — no build step needed.
+
+When the page loads it calls `GET /metadata` to populate the dropdowns.
+If the backend is offline it falls back to hard-coded options so you can still
+see the UI.
+
+---
+
+## API reference
+
+### `GET /metadata`
+Returns dropdown options and feature metadata.
+
+```json
+{
+  "categorical_options": {
+    "gender": ["Female", "Genderfluid", ...],
+    ...
+  },
+  "outcome_classes": ["Blocked", "Catfished", ...],
+  "numeric_features": ["app_usage_time_min", ...],
+  "feature_order": [...]
+}
+```
+
+### `POST /predict`
+Body (JSON) — all 15 features required:
+
+```json
+{
+  "gender": "Male",
+  "sexual_orientation": "Straight",
+  "location_type": "Urban",
+  "income_bracket": "High",
+  "education_level": "Bachelor\u2019s",
+  "app_usage_time_min": 90,
+  "swipe_right_ratio": 0.6,
+  "likes_received": 173,
+  "mutual_matches": 23,
+  "profile_pics_count": 4,
+  "bio_length": 150,
+  "message_sent_count": 75,
+  "emoji_usage_rate": 0.36,
+  "last_active_hour": 13,
+  "swipe_time_of_day": "Early Morning"
+}
+```
+
+Response:
+
+```json
+{
+  "prediction": "Mutual Match",
+  "confidence": 0.4231,
+  "probabilities": {
+    "Blocked": 0.031,
+    "Catfished": 0.018,
+    "Chat Ignored": 0.112,
+    "Date Happened": 0.095,
+    "Ghosted": 0.074,
+    "Instant Match": 0.089,
+    "Mutual Match": 0.423,
+    "No Action": 0.064,
+    "One-sided Like": 0.057,
+    "Relationship Formed": 0.037
+  }
+}
+```
+
+---
+
+## Pipeline notes (mirrors the notebook)
+
+| Step | Artifact | Applied to |
+|------|----------|------------|
+| 1 | `label_encoders.pkl` (one `LabelEncoder` per column) | `gender`, `sexual_orientation`, `location_type`, `income_bracket`, `education_level`, `swipe_time_of_day` |
+| 2 | `scaler.pkl` (`StandardScaler`) | all 15 features after encoding |
+| 3 | `best_model.pkl` (`GradientBoostingClassifier`) | scaled feature vector |
+| 4 | `le_target.pkl` (`LabelEncoder`) | inverse-transform predicted int → label |
+
+**⚠ Note on apostrophes**: The education-level classes were trained with curly
+apostrophes (`'`). The backend normalises any straight apostrophe (`'`) input
+automatically, so the frontend can use either style.
+
+**sklearn version**: The models were serialised with scikit-learn **1.6.1**.
+Pin your environment to that version (see `requirements.txt`) to avoid
+`InconsistentVersionWarning` and potential prediction drift.
